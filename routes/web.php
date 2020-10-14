@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ImageController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,5 +15,17 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('front/pages/home');
 });
+
+
+// images
+// Route::resource('/image', 'ImageController::class');
+Route::get('image/create', [ImageController::class, 'create'])->name('image.create');
+Route::get('image/index', [ImageController::class, 'index'])->name('image.index');
+Route::post('image/store', [ImageController::class, 'store'])->name('image.store');
+Route::get('image/{image}/show', [ImageController::class, 'show'])->name('image.show');
+
+Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
+    return view('dashboard');
+})->name('dashboard');

@@ -1,0 +1,49 @@
+version: "3"
+services:
+  redis:
+    image: redis:5.0.5
+    entrypoint: redis-server --appendonly yes
+    volumes:
+      - redis-data:/data
+    networks:
+      - picsum 
+
+  db:
+    image: mysql:8
+    command: --default-authentication-plugin=mysql_native_password
+    container_name: db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: picsum
+      MYSQL_USER: picsum
+      MYSQL_PASSWORD: picsum
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - picsum 
+    restart: unless-stopped 
+    tty: true 
+
+  web:
+    build: ./deploy/web
+    volumes:
+      - ./:/home/application/
+    environment:
+      WEB_DOCUMENT_ROOT: /home/application/public
+      XDEBUG_REMOTE_CONNECT_BACK: 1
+      XDEBUG_CONFIG: "idekey=123"
+      PHP_IDE_CONFIG: "serverName=_"
+    ports:
+      - "8080:80"
+      - "443:443"
+    depends_on:
+      - db
+    networks:
+      - picsum
+
+networks:
+  picsum:
+
+volumes:
+  db-data:
+  redis-data:
